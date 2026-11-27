@@ -1,16 +1,14 @@
-import { useEffect, useState } from "react";
-import { Check, MessageCircle, Package } from "lucide-react";
+import { Check, Package } from "lucide-react";
 import { useI18n } from "@/lib/i18n-context";
 import { formatDzd } from "@/lib/format";
 import { MAX_PER_LINE, useCart } from "@/lib/cart";
-import { useStoreSettings, type CatalogueProduct, type CatalogueVariant } from "@/lib/queries";
-import { waLink } from "@/lib/whatsapp";
+import { type CatalogueProduct, type CatalogueVariant } from "@/lib/queries";
 import { saleOf } from "@/lib/sale";
 import { Button } from "@/components/ui/button";
 
 /**
  * The parts of a product page that actually sell something: stock, variant
- * choice, quantity, add to cart and the WhatsApp order path.
+ * choice and quantity controls, and adding to the cart.
  *
  * Split out of `product-detail.tsx` when that file passed the 250-line limit.
  * The seam is real rather than arithmetic: everything here is an action, and
@@ -90,31 +88,6 @@ export function AddToCart({
 }) {
   const { t, locale } = useI18n();
   const { add } = useCart();
-  const { data: settings } = useStoreSettings();
-
-  // Read from state rather than `window` during render so the server and the
-  // first client render agree. An empty value on first paint is filtered out of
-  // the message below.
-  const [pageUrl, setPageUrl] = useState("");
-  useEffect(() => setPageUrl(window.location.href), []);
-
-  /**
-   * A buyer who is unsure will not fill in a form; they will send a message.
-   * Carrying the product, the variant, the quantity and the page link into a
-   * prefilled WhatsApp message turns that hesitation into an order, and costs
-   * nothing to maintain.
-   */
-  const waHref = waLink(
-    settings?.whatsapp,
-    [
-      t("store.waOrderIntro"),
-      `${name}${selected ? ` — ${variantLabel(selected)}` : ""}`,
-      `${quantity} × ${formatDzd(selected?.price ?? 0, locale)}`,
-      pageUrl,
-    ]
-      .filter(Boolean)
-      .join("\n"),
-  );
 
   const handleAdd = () => {
     if (!selected) return;
@@ -162,20 +135,6 @@ export function AddToCart({
           {t("store.addToCart")}
         </Button>
       </div>
-
-      {/* Secondary to adding to the cart, because a WhatsApp message is a real
-          order path in Algeria and not a fallback for a broken form. */}
-      {waHref && (
-        <a
-          href={waHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn btn-ghost btn-lg btn-block"
-        >
-          <MessageCircle size={18} aria-hidden="true" />
-          {t("store.orderViaWhatsapp")}
-        </a>
-      )}
     </div>
   );
 }

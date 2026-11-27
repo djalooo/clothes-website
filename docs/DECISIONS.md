@@ -327,3 +327,40 @@ owner chose (Arabic by default) and start with the shop name. Off until connecte
 **Rejected.** Supabase Vault for the token: its docs do not state it is enabled on every
 project, and a no-grant table keeps the token out of every API path. Arabic-only
 messages (as on JOAT-store): OpenStore shops are run in all three languages.
+
+## 16. One shared design for customer-facing storefront pages
+
+**Context.** The home, catalogue and tracking pages had opted into the editorial design
+individually, while search, product, checkout and order pages still used the older
+storefront palette and header.
+
+**Decision.** Every customer-facing page that uses `StoreLayout` shares the editorial
+header, footer, typography and neutral/emerald palette. The admin interface keeps the
+platform palette. A shop's configured brand colour still overrides the storefront's
+default emerald accent.
+
+**Reason.** Buyers move between pages in one shopping journey; changing the header or
+accent colour between those steps makes the shop feel like separate products.
+
+**Consequences.** The burnt-orange palette in decision 7 remains the admin default. The
+customer-facing storefront uses the editorial palette, and its shared layout owns the
+common chrome while each route keeps its own content layout.
+
+## 17. One canonical storefront product card
+
+**Context.** Home, catalogue and related-product sections already reused `ProductCard`,
+but page-specific CSS overrides changed its contents, spacing and typography.
+
+**Decision.** `ProductGrid` and `ProductCard` own the storefront card presentation.
+The homepage's compact square-image, title-and-price design is the shared reference;
+catalogue and related-product sections use the same card and responsive grid. Avoid
+route-specific product-card styles.
+
+**Reason.** A shared component is not a single source of truth if route selectors
+silently restyle it. Centralizing the markup and CSS keeps the design consistent and
+makes a later card change apply everywhere.
+
+**Consequences.** Cards remain a single link to the product, retaining sale and
+out-of-stock details. Category labels, ratings and the redundant details button are
+not shown on cards; buyers can still browse categories and see product ratings on the
+product page.

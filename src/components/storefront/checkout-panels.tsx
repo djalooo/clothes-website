@@ -138,10 +138,7 @@ export function CodNotice() {
   return (
     <p className="flex items-start gap-3 rounded-[16px] border border-primary/30 bg-primary/5 p-4 text-sm">
       <Banknote size={18} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
-      <span>
-        <strong className="block font-medium">{t("checkout.codTitle")}</strong>
-        <span className="text-on-surface-muted">{t("checkout.codBody")}</span>
-      </span>
+      <strong className="block font-medium">{t("checkout.codTitle")}</strong>
     </p>
   );
 }

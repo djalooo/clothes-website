@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CatalogueRouteImport } from './routes/catalogue'
+import { Route as CategoryRouteImport } from './routes/category'
 import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
@@ -53,6 +54,11 @@ const AdminRoute = AdminRouteImport.update({
 const CatalogueRoute = CatalogueRouteImport.update({
   id: '/catalogue',
   path: '/catalogue',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoryRoute = CategoryRouteImport.update({
+  id: '/category',
+  path: '/category',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutRoute = CheckoutRouteImport.update({
@@ -156,9 +162,9 @@ const ApiTelegramRoute = ApiTelegramRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategorySlugRoute = CategorySlugRouteImport.update({
-  id: '/category/$slug',
-  path: '/category/$slug',
-  getParentRoute: () => rootRouteImport,
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => CategoryRoute,
 } as any)
 const OauthConsentRoute = OauthConsentRouteImport.update({
   id: '/oauth/consent',
@@ -196,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/catalogue': typeof CatalogueRoute
+  '/category': typeof CategoryRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/catalogue': typeof CatalogueRoute
+  '/category': typeof CategoryRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
   '/catalogue': typeof CatalogueRoute
+  '/category': typeof CategoryRouteWithChildren
   '/checkout': typeof CheckoutRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -294,6 +303,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/catalogue'
+    | '/category'
     | '/checkout'
     | '/forgot-password'
     | '/login'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/catalogue'
+    | '/category'
     | '/checkout'
     | '/forgot-password'
     | '/login'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/catalogue'
+    | '/category'
     | '/checkout'
     | '/forgot-password'
     | '/login'
@@ -390,6 +402,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRouteWithChildren
   CatalogueRoute: typeof CatalogueRoute
+  CategoryRoute: typeof CategoryRouteWithChildren
   CheckoutRoute: typeof CheckoutRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
@@ -400,7 +413,6 @@ export interface RootRouteChildren {
   TrackRoute: typeof TrackRoute
   ApiAiDriveRoute: typeof ApiAiDriveRoute
   ApiTelegramRoute: typeof ApiTelegramRoute
-  CategorySlugRoute: typeof CategorySlugRoute
   OauthConsentRoute: typeof OauthConsentRoute
   OrderTokenRoute: typeof OrderTokenRoute
   ProductSlugRoute: typeof ProductSlugRoute
@@ -428,6 +440,13 @@ declare module '@tanstack/react-router' {
       path: '/catalogue'
       fullPath: '/catalogue'
       preLoaderRoute: typeof CatalogueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category': {
+      id: '/category'
+      path: '/category'
+      fullPath: '/category'
+      preLoaderRoute: typeof CategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout': {
@@ -572,10 +591,10 @@ declare module '@tanstack/react-router' {
     }
     '/category/$slug': {
       id: '/category/$slug'
-      path: '/category/$slug'
+      path: '/$slug'
       fullPath: '/category/$slug'
       preLoaderRoute: typeof CategorySlugRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof CategoryRoute
     }
     '/oauth/consent': {
       id: '/oauth/consent'
@@ -654,10 +673,23 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface CategoryRouteChildren {
+  CategorySlugRoute: typeof CategorySlugRoute
+}
+
+const CategoryRouteChildren: CategoryRouteChildren = {
+  CategorySlugRoute: CategorySlugRoute,
+}
+
+const CategoryRouteWithChildren = CategoryRoute._addFileChildren(
+  CategoryRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRouteWithChildren,
   CatalogueRoute: CatalogueRoute,
+  CategoryRoute: CategoryRouteWithChildren,
   CheckoutRoute: CheckoutRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
@@ -668,7 +700,6 @@ const rootRouteChildren: RootRouteChildren = {
   TrackRoute: TrackRoute,
   ApiAiDriveRoute: ApiAiDriveRoute,
   ApiTelegramRoute: ApiTelegramRoute,
-  CategorySlugRoute: CategorySlugRoute,
   OauthConsentRoute: OauthConsentRoute,
   OrderTokenRoute: OrderTokenRoute,
   ProductSlugRoute: ProductSlugRoute,

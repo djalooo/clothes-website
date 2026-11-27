@@ -12,4 +12,10 @@ describe("brand colour", () => {
     expect(brandCss(null)).toBeNull();
     expect(brandCss("#c2410c")).toContain("--primary:#c2410c");
   });
+
+  it("applies the configured colour to the shared storefront theme", () => {
+    expect(brandCss("#c2410c")).toContain(
+      "html[data-theme] .editorial-layout{--primary:#c2410c;--primary-solid:#c2410c;--on-primary:#ffffff;}",
+    );
+  });
 });

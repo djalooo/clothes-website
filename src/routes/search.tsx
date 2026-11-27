@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Search as SearchIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { createFileRoute, useNavigate, useRouter } from "@tanstack/react-router";
+import { Search as SearchIcon, X } from "lucide-react";
 import { StoreLayout } from "@/components/storefront/store-layout";
 import { CatalogueView } from "@/components/storefront/catalogue-view";
 import { Button } from "@/components/ui/button";
@@ -41,34 +41,88 @@ export const Route = createFileRoute("/search")({
 function SearchPage() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const router = useRouter();
   const { q } = Route.useSearch();
   const [draft, setDraft] = useState(q ?? "");
+  const [showCancelButton, setShowCancelButton] = useState(() => !(q ?? "").trim());
+  const searchFieldRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => setDraft(q ?? ""), [q]);
 
   const query = (q ?? "").trim();
   const hasQuery = query.length > 0;
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
+    setShowCancelButton(false);
     void navigate({ to: "/search", search: { q: draft.trim() || undefined } });
   };
 
+  const clearSearch = () => {
+    setDraft("");
+    setShowCancelButton(true);
+    searchFieldRef.current?.querySelector("input")?.focus();
+    void navigate({ to: "/search", search: { q: undefined } });
+  };
+
+  const cancelSearch = () => {
+    if (router.history.canGoBack()) {
+      router.history.back();
+      return;
+    }
+
+    void navigate({ to: "/catalogue" });
+  };
+
   return (
-    <StoreLayout>
+    <StoreLayout showFooter={false}>
       <div className="container-page py-10">
-        <form onSubmit={submit} className="mb-8 flex flex-wrap items-end gap-3">
-          <Field label={t("search.title")} className="min-w-64 flex-1">
-            <Input
-              type="search"
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              placeholder={t("search.placeholder")}
-              autoFocus
-              maxLength={100}
-            />
+        {showCancelButton && (
+          <div className="mb-3 flex justify-end" dir="ltr">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={cancelSearch}
+              aria-label={t("common.cancel")}
+              title={t("common.cancel")}
+            >
+              <X size={18} aria-hidden="true" />
+            </Button>
+          </div>
+        )}
+        <form onSubmit={submit} className="search-form mb-8 flex flex-wrap items-end gap-3">
+          <Field label={t("search.title")} className="search-form-field min-w-0 flex-1 sm:min-w-64">
+            <div ref={searchFieldRef} className="search-input-control">
+              <Input
+                type="search"
+                className="search-input"
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                placeholder={t("search.placeholder")}
+                autoFocus
+                maxLength={100}
+              />
+              {draft.length > 0 && (
+                <button
+                  type="button"
+                  className="search-clear-button"
+                  onClick={clearSearch}
+                  aria-label={t("search.clear")}
+                  title={t("search.clear")}
+                >
+                  <X size={16} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </Field>
-          <Button type="submit" className="mb-0.5">
+          <Button
+            type="submit"
+            className="search-submit-button mb-0.5"
+            aria-label={t("nav.search")}
+          >
             <SearchIcon size={16} aria-hidden="true" />
-            {t("nav.search")}
+            <span className="search-submit-label">{t("nav.search")}</span>
           </Button>
         </form>
 

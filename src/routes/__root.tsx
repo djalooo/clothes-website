@@ -6,6 +6,7 @@ import { AlertTriangle } from "lucide-react";
 
 import "@fontsource-variable/cairo";
 import "@fontsource-variable/outfit";
+import "@fontsource-variable/public-sans";
 import "@fontsource-variable/fraunces/opsz.css";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";

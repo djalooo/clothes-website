@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { ShieldCheck } from "lucide-react";
 import { useI18n } from "@/lib/i18n-context";
 import { averageRating, sortVariants, useReviews, type CatalogueProduct } from "@/lib/queries";
 import {
@@ -103,10 +102,6 @@ export function ProductDetail({ product }: { product: CatalogueProduct }) {
           </div>
         )}
 
-        <p className="flex items-center gap-2 rounded-[10px] bg-surface-mid px-4 py-3 text-xs text-on-surface-muted">
-          <ShieldCheck size={15} className="shrink-0 text-primary" aria-hidden="true" />
-          {t("checkout.codBody")}
-        </p>
       </div>
     </div>
   );

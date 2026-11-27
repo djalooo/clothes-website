@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Check, SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Field, Input, Select } from "@/components/ui/form";
+import { Field, Input } from "@/components/ui/form";
+import { SelectDropdown } from "@/components/select-dropdown";
 import { useI18n } from "@/lib/i18n-context";
 import { formatDzd } from "@/lib/format";
 import { activeFilterCount, type CatalogueFilters, type SortKey } from "@/lib/catalogue";
 import { cn } from "@/lib/utils";
+import { CatalogueCategoryControl } from "./catalogue-category-control";
+import { FilterGroup } from "./catalogue-filter-group";
 
 type Facets = {
   sizes: string[];
@@ -15,12 +18,10 @@ type Facets = {
 };
 
 /**
- * Catalogue filter and sort bar.
+ * Catalogue category, filter, and sort controls.
  *
- * Collapsed behind a button on every screen size, including desktop. A row of
- * chips permanently occupying the top of the page pushes the products down,
- * which fights the design thesis that the photography leads. The count on the
- * button is what tells a buyer filters are active.
+ * Facet controls stay collapsed behind the button at every breakpoint so the
+ * product grid retains its space. The count badge shows when filters are active.
  */
 export function CatalogueToolbar({
   filters,
@@ -30,21 +31,31 @@ export function CatalogueToolbar({
   priceMin,
   priceMax,
   resultCount,
+  showCategories = false,
 }: {
   filters: CatalogueFilters;
   onChange: (next: CatalogueFilters) => void;
   resultCount: number;
+  showCategories?: boolean;
 } & Facets) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const active = activeFilterCount(filters);
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-center gap-3">
+    <div className="catalogue-toolbar-content flex flex-col gap-3">
+      {showCategories && (
+        <CatalogueCategoryControl
+          categorySlug={filters.categorySlug}
+          onSelect={(categorySlug) => onChange({ ...filters, categorySlug })}
+        />
+      )}
+
+      <div className="catalogue-toolbar-actions">
         <Button
           variant="secondary"
           size="sm"
+          className="catalogue-filter-toggle"
           onClick={() => setOpen((value) => !value)}
           aria-expanded={open}
         >
@@ -57,25 +68,27 @@ export function CatalogueToolbar({
           )}
         </Button>
 
-        <span className="font-mono text-xs text-on-surface-muted">
+        <span className="sr-only" role="status" aria-live="polite">
           {resultCount} {t("catalogue.results")}
         </span>
 
-        <span className="ms-auto flex items-center gap-2">
-          <label htmlFor="catalogue-sort" className="text-xs text-on-surface-muted">
+        <span className="catalogue-sort">
+          <label htmlFor="catalogue-sort" className="sr-only">
             {t("catalogue.sort")}
           </label>
-          <Select
+          <SelectDropdown<SortKey>
             id="catalogue-sort"
+            ariaLabel={t("catalogue.sort")}
             value={filters.sort}
-            onChange={(event) => onChange({ ...filters, sort: event.target.value as SortKey })}
-            className="h-9 w-auto py-0"
-          >
-            <option value="newest">{t("catalogue.sortNewest")}</option>
-            <option value="price-asc">{t("catalogue.sortPriceAsc")}</option>
-            <option value="price-desc">{t("catalogue.sortPriceDesc")}</option>
-            <option value="name">{t("catalogue.sortName")}</option>
-          </Select>
+            onValueChange={(sort) => onChange({ ...filters, sort })}
+            className="catalogue-sort-select"
+            options={[
+              { value: "newest", label: t("catalogue.sortNewest") },
+              { value: "price-asc", label: t("catalogue.sortPriceAsc") },
+              { value: "price-desc", label: t("catalogue.sortPriceDesc") },
+              { value: "name", label: t("catalogue.sortName") },
+            ]}
+          />
         </span>
       </div>
 
@@ -105,10 +118,19 @@ function FilterPanel({
   onChange: (next: CatalogueFilters) => void;
 } & Facets) {
   const { t } = useI18n();
-  const active = activeFilterCount(filters);
 
   const set = <K extends keyof CatalogueFilters>(key: K, value: CatalogueFilters[K]) =>
     onChange({ ...filters, [key]: value });
+
+  const clear = () =>
+    onChange({
+      ...filters,
+      sizes: [],
+      colors: [],
+      minPrice: null,
+      maxPrice: null,
+      inStockOnly: false,
+    });
 
   const toggleIn = (key: "sizes" | "colors", value: string) => {
     const current = filters[key];
@@ -116,12 +138,18 @@ function FilterPanel({
   };
 
   return (
-    <div className="flex flex-col gap-5 rounded-[16px] border border-outline bg-surface p-5">
+    <div className="catalogue-filter-panel">
+      <button type="button" onClick={clear} className="catalogue-clear-all">
+        {t("catalogue.clearAll")}
+      </button>
+
       {sizes.length > 0 && (
         <FilterGroup
           label={t("catalogue.size")}
           values={sizes}
           selected={filters.sizes}
+          allLabel={t("catalogue.all")}
+          onClear={() => set("sizes", [])}
           onToggle={(value) => toggleIn("sizes", value)}
         />
       )}
@@ -131,15 +159,28 @@ function FilterPanel({
           label={t("catalogue.color")}
           values={colors}
           selected={filters.colors}
+          allLabel={t("catalogue.all")}
+          onClear={() => set("colors", [])}
           onToggle={(value) => toggleIn("colors", value)}
         />
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="catalogue-price-filters">
         <span className="text-xs font-semibold uppercase tracking-[0.03em] text-on-surface-muted">
           {t("catalogue.price")}
         </span>
         <div className="flex flex-wrap items-end gap-3">
+          <button
+            type="button"
+            className={cn(
+              "chip",
+              filters.minPrice === null && filters.maxPrice === null && "filled",
+            )}
+            aria-pressed={filters.minPrice === null && filters.maxPrice === null}
+            onClick={() => onChange({ ...filters, minPrice: null, maxPrice: null })}
+          >
+            {t("catalogue.all")}
+          </button>
           <Field label={t("catalogue.priceFrom")} className="w-32">
             <Input
               type="number"
@@ -181,66 +222,6 @@ function FilterPanel({
         />
         {t("catalogue.inStockOnly")}
       </label>
-
-      {active > 0 && (
-        <button
-          type="button"
-          onClick={() =>
-            onChange({
-              ...filters,
-              sizes: [],
-              colors: [],
-              minPrice: null,
-              maxPrice: null,
-              inStockOnly: false,
-            })
-          }
-          className="self-start text-sm font-medium text-primary hover:underline"
-        >
-          {t("catalogue.clearAll")}
-        </button>
-      )}
     </div>
-  );
-}
-
-function FilterGroup({
-  label,
-  values,
-  selected,
-  onToggle,
-}: {
-  label: string;
-  values: string[];
-  selected: string[];
-  onToggle: (value: string) => void;
-}) {
-  return (
-    <fieldset className="flex flex-col gap-2">
-      <legend className="text-xs font-semibold uppercase tracking-[0.03em] text-on-surface-muted">
-        {label}
-      </legend>
-      <div className="flex flex-wrap gap-2">
-        {values.map((value) => {
-          const isOn = selected.includes(value);
-          return (
-            <button
-              key={value}
-              type="button"
-              onClick={() => onToggle(value)}
-              aria-pressed={isOn}
-              className={cn("chip", isOn && "filled")}
-            >
-              {isOn ? (
-                <Check size={13} aria-hidden="true" />
-              ) : (
-                <X size={13} className="opacity-0" aria-hidden="true" />
-              )}
-              {value}
-            </button>
-          );
-        })}
-      </div>
-    </fieldset>
   );
 }

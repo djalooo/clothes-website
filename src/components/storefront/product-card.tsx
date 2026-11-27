@@ -11,14 +11,12 @@ import {
 } from "@/lib/queries";
 import { localized } from "@/lib/i18n";
 import { saleOf } from "@/lib/sale";
-import { StarRating } from "./star-rating";
 
 /**
- * Catalogue card.
+ * Shared storefront product card.
  *
- * Full-bleed 1:1 media, then a deliberately small text block: brand line, title,
- * rating, mono price, CTA. The thesis is that the photograph sells and the card
- * should not compete with it, so the only coloured element is the price.
+ * The homepage presentation is the shared reference: square media, compact title
+ * and price. The whole card links to the product, so it needs no nested CTA.
  */
 function ProductCard({ product }: { product: CatalogueProduct }) {
   const { t, locale } = useI18n();
@@ -30,14 +28,6 @@ function ProductCard({ product }: { product: CatalogueProduct }) {
   const sale = cheapest ? saleOf(cheapest) : null;
   const stock = totalStock(product);
   const soldOut = stock <= 0;
-  const rating = product.rating_avg ?? null;
-  const ratingCount = product.rating_count ?? 0;
-  // Display only, not a link: the whole card is already an anchor, and a nested
-  // anchor is invalid HTML. Category navigation lives on the category pages and
-  // the category strip.
-  const category = product.categories
-    ? localized(locale, product.categories.name, product.categories.name_fr)
-    : undefined;
 
   return (
     <Link to="/product/$slug" params={{ slug: product.slug }} className="product-card">
@@ -51,16 +41,7 @@ function ProductCard({ product }: { product: CatalogueProduct }) {
       </div>
 
       <div className="pc-body">
-        {category && <span className="pc-brand">{category}</span>}
-
         <h3 className="pc-title">{localized(locale, product.name, product.name_fr)}</h3>
-
-        {rating !== null && ratingCount > 0 && (
-          <span className="pc-rating">
-            <StarRating value={rating} />
-            <span className="rcount">({ratingCount})</span>
-          </span>
-        )}
 
         {range && (
           <span className="pc-price-row">
@@ -81,10 +62,6 @@ function ProductCard({ product }: { product: CatalogueProduct }) {
             )}
           </span>
         )}
-
-        <span className="pc-cta">
-          <span className="btn btn-secondary btn-sm btn-block">{t("store.viewDetails")}</span>
-        </span>
       </div>
     </Link>
   );

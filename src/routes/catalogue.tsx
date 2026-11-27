@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { StoreLayout } from "@/components/storefront/store-layout";
 import { CatalogueView } from "@/components/storefront/catalogue-view";
 import { EMPTY_FILTERS, cataloguePageQuery } from "@/lib/catalogue";
@@ -6,10 +6,16 @@ import { translate } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n-context";
 
 export const Route = createFileRoute("/catalogue")({
+  validateSearch: (search: Record<string, unknown>): { category?: string } => ({
+    category: typeof search.category === "string" ? search.category : undefined,
+  }),
+  loaderDeps: ({ search }) => ({ categorySlug: search.category ?? null }),
   // Prefetched so the server sends products rather than an empty grid.
-  loader: async ({ context }) => {
+  loader: async ({ context, deps }) => {
     await context.queryClient
-      .ensureQueryData(cataloguePageQuery(EMPTY_FILTERS, 1))
+      .ensureQueryData(
+        cataloguePageQuery({ ...EMPTY_FILTERS, categorySlug: deps.categorySlug }, 1),
+      )
       .catch(() => null);
   },
   head: ({ match }) => ({
@@ -25,20 +31,30 @@ export const Route = createFileRoute("/catalogue")({
 });
 
 /**
- * The whole catalogue, unfiltered and paged.
+ * The catalogue, optionally filtered by category and paged.
  *
- * Exists because the home page used to render every product in one grid. Once
- * that grid shows a page, there has to be somewhere to see the rest, and neither
- * a category page nor a search page is that place: one narrows by category and the
- * other needs a query before it shows anything.
+ * Category selection stays on this route so buyers can browse the full catalogue
+ * without switching to a separate category page.
  */
 function CatalogueRoute() {
   const { t } = useI18n();
+  const { category } = Route.useSearch();
+  const navigate = useNavigate();
+  const selectCategory = (categorySlug: string | null) =>
+    void navigate({
+      to: "/catalogue",
+      search: { category: categorySlug ?? undefined },
+    });
 
   return (
     <StoreLayout>
-      <div className="container-page py-10">
-        <CatalogueView heading={t("nav.products")} />
+      <div className="container-page catalogue-page py-10">
+        <CatalogueView
+          heading={t("nav.products")}
+          showCategories
+          controlledCategorySlug={category ?? null}
+          onCategoryChange={selectCategory}
+        />
       </div>
     </StoreLayout>
   );

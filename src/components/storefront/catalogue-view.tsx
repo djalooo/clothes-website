@@ -28,12 +28,18 @@ export function CatalogueView({
   initialFilters,
   emptyTitle,
   emptyBody,
+  showCategories = false,
+  controlledCategorySlug,
+  onCategoryChange,
 }: {
   heading: string;
   subheading?: string;
   initialFilters?: Partial<CatalogueFilters>;
   emptyTitle?: string;
   emptyBody?: string;
+  showCategories?: boolean;
+  controlledCategorySlug?: string | null;
+  onCategoryChange?: (categorySlug: string | null) => void;
 }) {
   const { t } = useI18n();
   const [filters, setFilters] = useState<CatalogueFilters>({
@@ -47,9 +53,20 @@ export function CatalogueView({
   // stay immediate.
   const debouncedMin = useDebouncedValue(filters.minPrice);
   const debouncedMax = useDebouncedValue(filters.maxPrice);
+  const effectiveCategorySlug =
+    controlledCategorySlug === undefined ? filters.categorySlug : controlledCategorySlug;
+  const toolbarFilters =
+    controlledCategorySlug === undefined
+      ? filters
+      : { ...filters, categorySlug: controlledCategorySlug };
   const effectiveFilters = useMemo(
-    () => ({ ...filters, minPrice: debouncedMin, maxPrice: debouncedMax }),
-    [filters, debouncedMin, debouncedMax],
+    () => ({
+      ...filters,
+      categorySlug: effectiveCategorySlug,
+      minPrice: debouncedMin,
+      maxPrice: debouncedMax,
+    }),
+    [filters, effectiveCategorySlug, debouncedMin, debouncedMax],
   );
 
   const catalogue = useCataloguePage(effectiveFilters, page);
@@ -59,6 +76,9 @@ export function CatalogueView({
   const applyFilters = (next: CatalogueFilters) => {
     setFilters(next);
     setPage(1);
+    if (next.categorySlug !== effectiveCategorySlug) {
+      onCategoryChange?.(next.categorySlug);
+    }
   };
 
   const goToPage = (next: number) => {
@@ -69,21 +89,24 @@ export function CatalogueView({
   };
 
   return (
-    <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-2">
+    <div className="catalogue-view flex flex-col gap-6">
+      <header className="catalogue-heading flex flex-col gap-2">
         <h1 className="font-display text-2xl font-semibold sm:text-3xl">{heading}</h1>
         {subheading && <p className="max-w-2xl text-sm text-on-surface-muted">{subheading}</p>}
       </header>
 
-      <CatalogueToolbar
-        filters={filters}
-        onChange={applyFilters}
-        sizes={facets.sizes}
-        colors={facets.colors}
-        priceMin={facets.priceMin}
-        priceMax={facets.priceMax}
-        resultCount={catalogue.data?.total ?? 0}
-      />
+      <div className="catalogue-toolbar">
+        <CatalogueToolbar
+          filters={toolbarFilters}
+          onChange={applyFilters}
+          sizes={facets.sizes}
+          colors={facets.colors}
+          priceMin={facets.priceMin}
+          priceMax={facets.priceMax}
+          resultCount={catalogue.data?.total ?? 0}
+          showCategories={showCategories}
+        />
+      </div>
 
       {catalogue.isPending ? (
         <CatalogueLoading />

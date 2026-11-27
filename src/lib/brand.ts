@@ -21,5 +21,5 @@ export function textOn(hex: string): "#111111" | "#ffffff" {
 export function brandCss(color: string | null | undefined): string | null {
   if (!color || !HEX.test(color)) return null;
   const on = textOn(color);
-  return `:root,:root[data-theme]{--primary:${color};--primary-solid:${color};--on-primary:${on};}`;
+  return `:root,:root[data-theme]{--primary:${color};--primary-solid:${color};--on-primary:${on};}html[data-theme] .editorial-layout{--primary:${color};--primary-solid:${color};--on-primary:${on};}`;
 }

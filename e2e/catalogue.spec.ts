@@ -30,6 +30,41 @@ async function visibleProducts(page: Page): Promise<string[]> {
     .evaluateAll((links) => links.map((link) => (link.textContent ?? "").trim()).filter(Boolean));
 }
 
+async function productCardAppearance(page: Page, selector: string) {
+  const card = page.locator(selector).first();
+  await card.waitFor({ state: "visible", timeout: 15_000 });
+
+  return card.evaluate((element) => {
+    const grid = element.closest(".product-grid");
+    const media = element.querySelector<HTMLElement>(".pc-media");
+    const body = element.querySelector<HTMLElement>(".pc-body");
+    const title = element.querySelector<HTMLElement>(".pc-title");
+    const price = element.querySelector<HTMLElement>(".pc-price");
+    const cardStyle = getComputedStyle(element);
+    const isVisible = (selector: string) => {
+      const child = element.querySelector<HTMLElement>(selector);
+      return Boolean(child && getComputedStyle(child).display !== "none");
+    };
+
+    return {
+      columns: grid ? getComputedStyle(grid).gridTemplateColumns.split(" ").length : 0,
+      rowGap: grid ? getComputedStyle(grid).rowGap : "",
+      columnGap: grid ? getComputedStyle(grid).columnGap : "",
+      border: `${cardStyle.borderTopWidth} ${cardStyle.borderTopStyle}`,
+      borderRadius: cardStyle.borderTopLeftRadius,
+      background: cardStyle.backgroundColor,
+      mediaAspectRatio: media ? getComputedStyle(media).aspectRatio : "",
+      mediaRadius: media ? getComputedStyle(media).borderTopLeftRadius : "",
+      bodyPadding: body ? getComputedStyle(body).paddingTop : "",
+      categoryVisible: isVisible(".pc-brand"),
+      ratingVisible: isVisible(".pc-rating"),
+      titleFontSize: title ? getComputedStyle(title).fontSize : "",
+      priceFontSize: price ? getComputedStyle(price).fontSize : "",
+      actionVisible: isVisible(".pc-cta"),
+    };
+  });
+}
+
 test("the catalogue pages, and page two is not page one", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 1000 });
   await page.goto("/catalogue", { waitUntil: "networkidle" });
@@ -88,4 +123,43 @@ test("a category page shows only that category, and still pages", async ({ page 
   // Every card must belong to the category, which the server decided rather than
   // the browser filtering a full catalogue down.
   await expect(page.locator(".product-grid a[href^='/product/']").first()).toBeVisible();
+});
+
+test("product cards keep the homepage design throughout the storefront", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  await visibleProducts(page);
+  const homepageCard = await productCardAppearance(page, ".home-featured .product-card");
+  expect(homepageCard).toMatchObject({
+    columns: 2,
+    rowGap: "18px",
+    columnGap: "12px",
+    border: "0px none",
+    mediaAspectRatio: "1 / 1",
+    mediaRadius: "7px",
+    bodyPadding: "9px",
+    categoryVisible: false,
+    ratingVisible: false,
+    titleFontSize: "12px",
+    priceFontSize: "13px",
+    actionVisible: false,
+  });
+  const productPath = await page
+    .locator(".home-featured .product-card")
+    .first()
+    .getAttribute("href");
+  expect(productPath).toBeTruthy();
+
+  await page.goto("/catalogue", { waitUntil: "networkidle" });
+  await visibleProducts(page);
+  expect(await productCardAppearance(page, ".catalogue-page .product-card")).toEqual(homepageCard);
+
+  await page.goto(productPath!, { waitUntil: "networkidle" });
+  const relatedCard = page.locator('[aria-labelledby="related-title"] .product-card').first();
+  if (await relatedCard.count()) {
+    await expect(relatedCard).toBeVisible();
+    expect(
+      await productCardAppearance(page, '[aria-labelledby="related-title"] .product-card'),
+    ).toEqual(homepageCard);
+  }
 });

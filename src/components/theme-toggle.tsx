@@ -1,16 +1,36 @@
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { applyTheme, persistTheme, resolveTheme, type Theme } from "@/lib/theme";
+import { useI18n } from "@/lib/i18n-context";
 
-export function ThemeToggle({ className = "" }: { className?: string }) {
+const THEME_CHANGE_EVENT = "openstore:theme-change";
+
+export function ThemeToggle({
+  className = "",
+  showLabel = false,
+}: {
+  className?: string;
+  showLabel?: boolean;
+}) {
+  const { t } = useI18n();
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    const syncTheme = (event: Event) => {
+      if (
+        event instanceof CustomEvent &&
+        (event.detail === "light" || event.detail === "dark")
+      ) {
+        setTheme(event.detail);
+      }
+    };
+    window.addEventListener(THEME_CHANGE_EVENT, syncTheme);
     const current = resolveTheme();
     applyTheme(current);
     setTheme(current);
     setMounted(true);
+    return () => window.removeEventListener(THEME_CHANGE_EVENT, syncTheme);
   }, []);
 
   const toggle = () => {
@@ -18,9 +38,10 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
     applyTheme(next);
     persistTheme(next);
     setTheme(next);
+    window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT, { detail: next }));
   };
 
-  const label = theme === "dark" ? "Switch to light theme" : "Switch to dark theme";
+  const label = t(theme === "dark" ? "theme.switchToLight" : "theme.switchToDark");
 
   return (
     <button
@@ -38,6 +59,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
       ) : (
         <Moon size={18} aria-hidden="true" />
       )}
+      {showLabel && <span>{t("nav.theme")}</span>}
     </button>
   );
 }

@@ -72,8 +72,8 @@ function CategoryPage() {
               {others.map((entry) => (
                 <Link
                   key={entry.id}
-                  to="/category/$slug"
-                  params={{ slug: entry.slug }}
+                  to="/catalogue"
+                  search={{ category: entry.slug }}
                   className="chip"
                 >
                   {localized(locale, entry.name, entry.name_fr)}

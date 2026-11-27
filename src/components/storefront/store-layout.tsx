@@ -16,15 +16,21 @@ import { BrandStyle } from "./brand-style";
  * `page-bottom-pad` keeps page content clear of the fixed bottom tab bar on
  * mobile; the tab bar is hidden at 1024px and above.
  */
-export function StoreLayout({ children }: { children: React.ReactNode }) {
+export function StoreLayout({
+  children,
+  showFooter = true,
+}: {
+  children: React.ReactNode;
+  showFooter?: boolean;
+}) {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="editorial-layout flex min-h-dvh flex-col">
       <BrandStyle />
       <DemoBanner />
       <AnnouncementBar />
       <SiteHeader />
       <main className="page-bottom-pad flex-1 lg:pb-0">{children}</main>
-      <SiteFooter />
+      {showFooter && <SiteFooter />}
       <CartDrawer />
       <BottomNav />
     </div>
