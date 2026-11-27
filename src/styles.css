@@ -94,26 +94,26 @@
 [data-theme="dark"] {
   --bg: #0f0f0f;
   --bg-dim: #0f0f0f;
-  --surface: #0f0f0f;
-  --surface-mid: #0f0f0f;
-  --surface-high: #0f0f0f;
-  --surface-highest: #0f0f0f;
+  --surface: #222222;
+  --surface-mid: #222222;
+  --surface-high: #222222;
+  --surface-highest: #222222;
   --on-surface: #f2ece5;
   --on-surface-muted: #a8a29e;
-  --outline: #332a21;
+  --outline: #3F3F3F;
   --outline-hi: #4a3e31;
 
-  --primary: #fb923c;
-  --primary-solid: #fb923c;
+  --primary: #008236;
+  --primary-solid: #008236;
   --on-primary: #0f0f0f;
   --primary-glow: #0f0f0f;
   --primary-glow-sm: #0f0f0f;
 
-  --brand-orange: #fb923c;
-  --secondary: #fb7185;
+  --brand-orange: #008236;
+  --secondary: #008236;
   --secondary-dim: #f43f5e;
   --on-secondary: #2a050e;
-  --tertiary: #fbbf24;
+  --tertiary: #008236;
   --on-tertiary: #422006;
   --quaternary: #2dd4bf;
   --on-quaternary: #042f2e;
@@ -128,15 +128,15 @@
   --nav-bg: #0f0f0f;
   --scroll-track: #0f0f0f;
   --scroll-thumb: #0f0f0f;
-  --scroll-thumb-hi: #fb923c;
+  --scroll-thumb-hi: #008236;
   --toggle-bg: rgba(251, 146, 60, 0.08);
   --toggle-border: rgba(251, 146, 60, 0.25);
   --table-header-bg: #241d16;
-  --table-header-fg: #fb923c;
+  --table-header-fg: #008236;
   --table-row-bg: #16110c;
   --table-row-hover: #1d1712;
-  --table-border: #332a21;
-  --section-alt: #100c08;
+  --table-border: #3F3F3F;
+  --section-alt: #0f0f0f;
 }
 
 /* ── Tokens: scale (keep verbatim) ─────────────────────────────────────────── */
@@ -540,7 +540,7 @@
 }
 .pc-media {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   background: linear-gradient(135deg, var(--surface-high), var(--surface-mid));
   display: flex;
   align-items: center;
@@ -666,7 +666,7 @@
 }
 .gallery-main {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   border-radius: var(--r-lg);
   overflow: hidden;
   border: 1px solid var(--outline);
@@ -764,7 +764,7 @@ button.gallery-main {
   opacity: 0.55;
 }
 .gallery-thumb {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   border-radius: var(--r-sm);
   border: 2px solid var(--outline);
   background: linear-gradient(135deg, var(--surface-high), var(--surface-mid));
@@ -1650,7 +1650,7 @@ html[dir="rtl"] {
 }
 .gallery-track > button {
   scroll-snap-align: center;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1 / 1;
   padding: 0;
 }
 .gallery-track:focus-visible {
