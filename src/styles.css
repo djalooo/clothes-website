@@ -51,17 +51,17 @@
      #c2410c is the same hue one step darker: 5.18:1 with white and 4.85:1 on the
      cream background, passing both. The brand still reads as burnt orange; it
      just stops failing axe. Verified by e2e/accessibility.spec.ts. */
-  --primary: #c2410c;
-  --primary-solid: #c2410c;
+  --primary: #008236;
+  --primary-solid: #008236;
   --on-primary: #ffffff;
   --primary-glow: rgba(194, 65, 12, 0.18);
   --primary-glow-sm: rgba(194, 65, 12, 0.08);
 
-  --brand-orange: #ea580c;
+  --brand-orange: #008236;
   --secondary: #e11d48;
   --secondary-dim: #be123c;
   --on-secondary: #ffffff;
-  --tertiary: #b45309;
+  --tertiary: #008236;
   --on-tertiary: #ffffff;
   --quaternary: #0d9488;
   --on-quaternary: #ffffff;
@@ -79,11 +79,11 @@
   --nav-bg: #ffffff;
   --scroll-track: #f3efeb;
   --scroll-thumb: #ddd3c7;
-  --scroll-thumb-hi: #d9480f;
-  --toggle-bg: rgba(217, 72, 15, 0.06);
-  --toggle-border: rgba(217, 72, 15, 0.22);
+  --scroll-thumb-hi: #008236;
+  --toggle-bg: rgba(0, 130, 54, 0.06);
+  --toggle-border: rgba(0, 130, 54, 0.22);
   --table-header-bg: #f0ebe6;
-  --table-header-fg: #9a3412;
+  --table-header-fg: #008236;
   --table-row-bg: #ffffff;
   --table-row-hover: #faf7f4;
   --table-border: #e7e0d8;
