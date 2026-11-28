@@ -7,6 +7,10 @@ export const frTools = {
   "admin.categories.nameLatin": "Nom en français",
   "admin.categories.nameLatinHint":
     "Sert à l’adresse de la page et aux clients francophones et anglophones.",
+  "admin.categories.image": "Image de catégorie (facultative)",
+  "admin.categories.imageHint":
+    "Affichée sur l’accueil pour les catégories actives avec des produits.",
+  "admin.categories.imageUrlInvalid": "Saisissez une URL d’image valide commençant par https://.",
   "admin.categories.add": "Ajouter une catégorie",
   "admin.categories.empty": "Aucune catégorie pour l’instant",
   "admin.categories.count": "{count} produit(s)",

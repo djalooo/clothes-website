@@ -114,17 +114,9 @@ function extensionFor(type: string): string {
   return "jpg";
 }
 
-/**
- * Upload one product image and return its public URL.
- *
- * The object path is `products/<productId>/<random>.<ext>`. Randomising the
- * filename means replacing an image never overwrites the old bytes, so a CDN or
- * a browser holding the old URL cannot serve a stale photo — and it removes any
- * need to sanitise a user-supplied filename.
- */
-export async function uploadProductImage(
+async function uploadMediaImage(
   file: File,
-  productId: string,
+  directory: string,
   frame?: Frame,
 ): Promise<UploadOutcome> {
   if (!file.type.startsWith("image/")) {
@@ -147,7 +139,7 @@ export async function uploadProductImage(
     return { url: null, error: "That image is too large even after resizing." };
   }
 
-  const path = `products/${productId}/${crypto.randomUUID()}.${extensionFor(blob.type)}`;
+  const path = `${directory}/${crypto.randomUUID()}.${extensionFor(blob.type)}`;
 
   const { error } = await getSupabase()
     .storage.from(BUCKET)
@@ -157,6 +149,23 @@ export async function uploadProductImage(
 
   const { data } = getSupabase().storage.from(BUCKET).getPublicUrl(path);
   return { url: data.publicUrl, error: null };
+}
+
+/**
+ * Upload a product image under `products/<productId>/` with a unique filename,
+ * so a CDN cannot serve stale bytes after an image is replaced.
+ */
+export function uploadProductImage(
+  file: File,
+  productId: string,
+  frame?: Frame,
+): Promise<UploadOutcome> {
+  return uploadMediaImage(file, `products/${productId}`, frame);
+}
+
+/** Upload a square category cover under `categories/<categoryId>/`. */
+export function uploadCategoryImage(file: File, categoryId: string): Promise<UploadOutcome> {
+  return uploadMediaImage(file, `categories/${categoryId}`, { aspect: 1, focus: 0.5 });
 }
 
 /**

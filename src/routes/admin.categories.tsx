@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import { CategoryCreateForm } from "@/components/admin/category-create-form";
 import { CategoryRow } from "@/components/admin/category-row";
-import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { EmptyState, ErrorState, LoadingState } from "@/components/ui/feedback";
-import { Field, Input } from "@/components/ui/form";
 import { useI18n } from "@/lib/i18n-context";
 import {
   ADMIN_CATEGORIES_KEY,
-  createCategory,
+  createCategoryWithImage,
   deleteCategory,
   updateCategory,
   useAdminCategories,
@@ -34,8 +32,7 @@ function CategoriesPage() {
   const { t } = useI18n();
   const queryClient = useQueryClient();
   const { data, isPending, isError, error, refetch } = useAdminCategories();
-  const [name, setName] = useState("");
-  const [nameFr, setNameFr] = useState("");
+  const [createFormKey, setCreateFormKey] = useState(0);
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: ADMIN_CATEGORIES_KEY });
@@ -45,11 +42,10 @@ function CategoriesPage() {
   const onError = (mutationError: Error) => toast.error(mutationError.message);
 
   const create = useMutation({
-    mutationFn: createCategory,
+    mutationFn: createCategoryWithImage,
     onSuccess: () => {
       invalidate();
-      setName("");
-      setNameFr("");
+      setCreateFormKey((key) => key + 1);
     },
     onError,
   });
@@ -95,37 +91,13 @@ function CategoriesPage() {
 
       <Card>
         <CardBody>
-          <form
-            className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end"
-            onSubmit={(event) => {
-              event.preventDefault();
-              create.mutate({
-                name: name.trim(),
-                name_fr: nameFr.trim() || null,
-                sort_order: list.length,
-              });
-            }}
-          >
-            <Field label={t("admin.categories.name")} required>
-              <Input
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                dir="rtl"
-                required
-                minLength={2}
-              />
-            </Field>
-            <Field
-              label={t("admin.categories.nameLatin")}
-              hint={t("admin.categories.nameLatinHint")}
-            >
-              <Input value={nameFr} onChange={(e) => setNameFr(e.target.value)} dir="ltr" />
-            </Field>
-            <Button type="submit" disabled={busy || name.trim().length < 2}>
-              <Plus size={16} aria-hidden="true" />
-              {t("admin.categories.add")}
-            </Button>
-          </form>
+          <CategoryCreateForm
+            key={createFormKey}
+            sortOrder={list.length}
+            busy={busy}
+            creating={create.isPending}
+            onCreate={(input) => create.mutate(input)}
+          />
         </CardBody>
       </Card>
 

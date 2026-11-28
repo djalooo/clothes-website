@@ -78,7 +78,9 @@ Last verified against the built output, not the dev server.
   south price, free-delivery threshold, legal details. Demo values start blank.
   The dashboard keeps a checklist of anything buyers still see as missing or fake.
 - **Categories screen.** Create, rename, hide, reorder and delete categories
-  without SQL. Deleting one leaves its products in the shop, uncategorised.
+  without SQL; add an optional square image by uploading a file or pasting a public
+  HTTPS image URL. Images show for every active category with products.
+  Deleting one leaves its products in the shop, uncategorised.
 - **Variant generator.** Colours × sizes with one price and stock, previewed
   before writing; existing combinations are skipped, so running it twice is safe.
   Swatch colours are guessed from common names in Arabic, French and English.

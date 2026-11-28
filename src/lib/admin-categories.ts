@@ -1,5 +1,6 @@
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { getSupabase } from "./supabase/client";
+import { deleteProductImage, uploadCategoryImage } from "./image";
 import { slugify } from "./format";
 
 /**
@@ -50,10 +51,11 @@ function slugFor(name: string, nameFr: string | null, attempt: number): string {
   return attempt === 0 ? base : `${base}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export async function createCategory(input: {
+async function createCategory(input: {
   name: string;
   name_fr: string | null;
   sort_order: number;
+  image_url: string | null;
 }): Promise<void> {
   for (let attempt = 0; attempt < 3; attempt += 1) {
     const { error } = await getSupabase()
@@ -64,6 +66,51 @@ export async function createCategory(input: {
     if (error.code !== "23505") throw new Error(error.message);
   }
   throw new Error("Could not find a free web address for this category. Try another name.");
+}
+
+export function isValidCategoryImageUrl(value: string): boolean {
+  try {
+    const url = new URL(value.trim());
+    return url.protocol === "https:" && Boolean(url.hostname) && !url.username && !url.password;
+  } catch {
+    return false;
+  }
+}
+
+export async function createCategoryWithImage(input: {
+  name: string;
+  name_fr: string | null;
+  sort_order: number;
+  image: File | null;
+  image_url: string | null;
+}): Promise<void> {
+  const { image, image_url, ...category } = input;
+  const linkedImageUrl = image_url?.trim() || null;
+  if (image && linkedImageUrl) {
+    throw new Error("Choose either an image file or an image URL.");
+  }
+  if (linkedImageUrl && !isValidCategoryImageUrl(linkedImageUrl)) {
+    throw new Error("Use a valid HTTPS image URL.");
+  }
+
+  let imageUrl = linkedImageUrl ? new URL(linkedImageUrl).href : null;
+  let uploadedImageUrl: string | null = null;
+
+  if (image) {
+    const upload = await uploadCategoryImage(image, crypto.randomUUID());
+    if (!upload.url || upload.error) {
+      throw new Error(upload.error ?? "Could not upload the category image.");
+    }
+    imageUrl = upload.url;
+    uploadedImageUrl = upload.url;
+  }
+
+  try {
+    await createCategory({ ...category, image_url: imageUrl });
+  } catch (error) {
+    if (uploadedImageUrl) await deleteProductImage(uploadedImageUrl);
+    throw error;
+  }
 }
 
 export async function updateCategory(

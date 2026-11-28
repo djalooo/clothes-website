@@ -8,7 +8,7 @@ import { localized } from "@/lib/i18n";
 export function CategoryStrip({ products }: { products: CatalogueProduct[] }) {
   const { t, locale } = useI18n();
   const { data: categories } = useCategories();
-  const visible = (categories ?? []).filter((category) => category.product_count > 0).slice(0, 3);
+  const visible = (categories ?? []).filter((category) => category.product_count > 0);
 
   if (visible.length === 0) return null;
 

@@ -160,7 +160,7 @@ export const frStorefront = {
   "reviews.thanksBody": "Votre avis sera visible après validation par la boutique.",
   "reviews.count": "{count} avis",
   "reviews.awaitingModeration": "En attente de validation",
-  "home.eyebrow": "Collection d’automne",
+  "home.eyebrow": "Des produits fabriqués par nos soins",
   "home.hero.title": "Des objets discrets pour les rituels du quotidien",
   "home.hero.body":
     "Des pièces en grès et des objets choisis pour des rituels quotidiens plus doux.",

@@ -7,6 +7,9 @@ export const enTools = {
   "admin.categories.nameLatin": "Name (French)",
   "admin.categories.nameLatinHint":
     "Used in the page address and shown to French and English buyers.",
+  "admin.categories.image": "Category image (optional)",
+  "admin.categories.imageHint": "Shown on the homepage for active categories with products.",
+  "admin.categories.imageUrlInvalid": "Enter a valid image URL starting with https://.",
   "admin.categories.add": "Add category",
   "admin.categories.empty": "No categories yet",
   "admin.categories.count": "{count} products",
