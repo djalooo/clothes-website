@@ -1,4 +1,5 @@
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Outlet, createRootRouteWithContext, Scripts, HeadContent } from "@tanstack/react-router";
 import type { QueryClient } from "@tanstack/react-query";
 import { Toaster } from "sonner";
@@ -23,6 +24,7 @@ import { AuthProvider } from "@/lib/auth";
 import { CartProvider } from "@/lib/cart";
 import { ServiceWorkerRegistrar } from "@/components/service-worker";
 import { Button } from "@/components/ui/button";
+import { useStoreSettings } from "@/lib/queries";
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   // Runs on the server for the first request and in the browser after, reading
@@ -41,10 +43,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", href: "/favicon.svg" },
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/icon-192.png" },
-      { rel: "icon", type: "image/png", sizes: "512x512", href: "/icon-512.png" },
       // The headline waits for its font, and the browser only finds the font
       // after the stylesheet. Preloading the fonts of the first screen, for the
       // visitor's language, lets them download alongside the page instead.
@@ -95,6 +96,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider initialLocale={locale}>
+        <StoreFavicon />
         <AuthProvider>
           <CartProvider>
             <Outlet />
@@ -105,6 +107,17 @@ function RootComponent() {
       </I18nProvider>
     </QueryClientProvider>
   );
+}
+
+function StoreFavicon() {
+  const { data: settings } = useStoreSettings();
+
+  useEffect(() => {
+    const icon = document.head.querySelector<HTMLLinkElement>('link[rel="icon"]');
+    if (icon) icon.href = settings?.favicon_url ?? "/favicon.svg";
+  }, [settings?.favicon_url]);
+
+  return null;
 }
 
 /**

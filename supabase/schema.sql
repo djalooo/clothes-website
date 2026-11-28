@@ -71,6 +71,8 @@ create table if not exists public.store_settings (
   description_fr      text,
   address_fr          text,
   logo_url            text,
+  logo_dark_url       text,
+  favicon_url         text,
   banner_url          text,
   -- The storefront's primary colour, "#rrggbb". Null keeps the default theme.
   brand_color         text check (brand_color ~ '^#[0-9a-fA-F]{6}$'),
@@ -316,7 +318,9 @@ create table if not exists public.delivery_zones (
 alter table public.store_settings
   add column if not exists tagline_fr text,
   add column if not exists description_fr text,
-  add column if not exists address_fr text;
+  add column if not exists address_fr text,
+  add column if not exists logo_dark_url text,
+  add column if not exists favicon_url text;
 alter table public.size_guides
   add column if not exists note_fr text;
 alter table public.store_settings
@@ -2947,7 +2951,7 @@ language sql
 immutable
 set search_path = ''
 as $$
-  select 6;
+  select 7;
 $$;
 revoke all on function public.openstore_schema_version() from public;
 grant execute on function public.openstore_schema_version() to anon, authenticated;

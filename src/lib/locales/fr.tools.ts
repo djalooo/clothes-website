@@ -94,6 +94,12 @@ export const frTools = {
   "admin.brand.logo": "Logo (facultatif)",
   "admin.brand.logoHint":
     "Sans logo, seul le nom de votre boutique s’affiche. C’est très bien aussi.",
+  "admin.brand.logoDark": "Logo du mode sombre",
+  "admin.brand.logoDarkHint": "Ce logo apparaît lorsque le mode sombre est activé.",
+  "admin.brand.favicon": "Icône du site (favicon)",
+  "admin.brand.faviconHint": "Affichée dans l’onglet du navigateur. Une image carrée est préférable.",
+  "admin.brand.uploadFavicon": "Téléverser l’icône du site",
+  "admin.brand.replaceFavicon": "Remplacer l’icône du site",
   "admin.brand.upload": "Téléverser le logo",
   "admin.brand.replace": "Remplacer",
   "admin.brand.color": "Couleur de la boutique",

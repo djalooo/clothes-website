@@ -97,7 +97,7 @@ grant update (customer_name, phone, wilaya, commune, address, note, status,
 
 | Table              | Holds                                                       | Public read    | Admin write |
 | ------------------ | ----------------------------------------------------------- | -------------- | ----------- |
-| `store_settings`   | name, legal disclosures, contact, Guepex origin wilaya      | yes            | yes         |
+| `store_settings`   | name, contact, legal details, branding and storefront rules | yes            | yes         |
 | `admin_users`      | shop owner and staff                                        | no             | yes         |
 | `products`         | single items and packs                                      | published only | yes         |
 | `product_variants` | size, colour, price, stock                                  | yes            | yes         |
@@ -160,11 +160,12 @@ stays an ordinary `AFTER UPDATE OF status` trigger. Before 0.3.0 the "created" e
 carried no items and a total of 0. Postgres has no `create or replace` for constraint
 triggers, so the file drops and recreates them.
 
-## Schema version (0.2.0)
+## Schema version (0.4.0)
 
 `openstore_schema_version()` returns the version of `schema.sql` the database last ran;
 `SCHEMA_VERSION` in `src/lib/version.ts` is the one the code expects. The dashboard asks
 the owner to run the update when the code is newer. **Bump both on every schema change.**
+Store branding includes optional light and dark logos and a favicon URL.
 
 ## AI assistant (0.3.0, section 13 plus pieces earlier in the file)
 

@@ -93,6 +93,12 @@ export const enTools = {
   "admin.brand.logo": "Logo (optional)",
   "admin.brand.logoHint":
     "Without a logo, your shop name is shown on its own. That works fine too.",
+  "admin.brand.logoDark": "Dark-mode logo",
+  "admin.brand.logoDarkHint": "This logo appears when dark mode is enabled.",
+  "admin.brand.favicon": "Site icon (favicon)",
+  "admin.brand.faviconHint": "Shown in the browser tab. A square image works best.",
+  "admin.brand.uploadFavicon": "Upload site icon",
+  "admin.brand.replaceFavicon": "Replace site icon",
   "admin.brand.upload": "Upload logo",
   "admin.brand.replace": "Replace",
   "admin.brand.color": "Shop colour",

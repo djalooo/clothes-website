@@ -31,6 +31,8 @@ const DEFAULTS: StoreSettings = {
   description_fr: null,
   address_fr: null,
   logo_url: null,
+  logo_dark_url: null,
+  favicon_url: null,
   banner_url: null,
   brand_color: null,
   legal_name: null,

@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, Input, Switch, Textarea } from "@/components/ui/form";
 import { useI18n } from "@/lib/i18n-context";
-import { ColorField, LogoField } from "./brand-fields";
+import { ColorField, DarkLogoField, FaviconField, LogoField } from "./brand-fields";
 import type { StoreSettings } from "@/lib/queries";
 
 /**
@@ -73,7 +73,14 @@ export function IdentityCard({ form, set }: { form: SettingsDraft; set: Settings
             dir="ltr"
           />
         </Field>
-        <LogoField value={form.logo_url} onChange={(url) => set("logo_url", url)} />
+        <div className="flex flex-col gap-4">
+          <LogoField value={form.logo_url} onChange={(url) => set("logo_url", url)} />
+          <DarkLogoField
+            value={form.logo_dark_url}
+            onChange={(url) => set("logo_dark_url", url)}
+          />
+          <FaviconField value={form.favicon_url} onChange={(url) => set("favicon_url", url)} />
+        </div>
         <ColorField value={form.brand_color} onChange={(color) => set("brand_color", color)} />
         <Field label={t("admin.settings.bannerUrl")}>
           <Input

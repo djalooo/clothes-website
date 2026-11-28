@@ -20,6 +20,8 @@ export type StoreSettings = {
   description_fr: string | null;
   address_fr: string | null;
   logo_url: string | null;
+  logo_dark_url: string | null;
+  favicon_url: string | null;
   banner_url: string | null;
   brand_color: string | null;
   legal_name: string | null;

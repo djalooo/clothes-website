@@ -6,39 +6,75 @@ import { useI18n } from "@/lib/i18n-context";
 import { uploadProductImage } from "@/lib/image";
 import { cn } from "@/lib/utils";
 
-/**
- * Logo and colour, the two things that make a shop look like the owner's.
- * Both optional: a shop with neither shows its name in the default theme.
- */
-export function LogoField({
-  value,
-  onChange,
-}: {
+type BrandImageKind = "logo" | "darkLogo" | "favicon";
+type BrandImageFieldProps = {
+  kind: BrandImageKind;
   value: string | null;
   onChange: (url: string | null) => void;
-}) {
+};
+
+function BrandImageField({
+  kind,
+  value,
+  onChange,
+}: BrandImageFieldProps) {
   const { t } = useI18n();
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
+  const isFavicon = kind === "favicon";
+  const label =
+    kind === "logo"
+      ? t("admin.brand.logo")
+      : kind === "darkLogo"
+        ? t("admin.brand.logoDark")
+        : t("admin.brand.favicon");
+  const hint =
+    kind === "logo"
+      ? t("admin.brand.logoHint")
+      : kind === "darkLogo"
+        ? t("admin.brand.logoDarkHint")
+        : t("admin.brand.faviconHint");
 
   const upload = async (file: File | undefined) => {
     if (!file) return;
     setBusy(true);
-    const { url, error } = await uploadProductImage(file, "brand");
-    setBusy(false);
-    if (error || !url) toast.error(error ?? t("common.somethingWrong"));
-    else onChange(url);
+    try {
+      const { url, error } = await uploadProductImage(
+        file,
+        "brand",
+        isFavicon ? { aspect: 1, focus: 0.5 } : undefined,
+      );
+      if (error || !url) toast.error(error ?? t("common.somethingWrong"));
+      else onChange(url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : t("common.somethingWrong"));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-semibold uppercase tracking-[0.03em] text-on-surface-muted">
-        {t("admin.brand.logo")}
+        {label}
       </span>
       <div className="flex flex-wrap items-center gap-3">
-        <span className="grid h-14 w-28 place-items-center overflow-hidden rounded-[10px] border border-dashed border-outline-hi bg-surface-mid">
+        <span
+          className={cn(
+            "grid h-14 place-items-center overflow-hidden rounded-[10px] border border-dashed border-outline-hi bg-surface-mid",
+            isFavicon ? "w-14" : "w-28",
+            kind === "darkLogo" && "bg-neutral-900",
+          )}
+        >
           {value ? (
-            <img src={value} alt="" className="max-h-12 max-w-24 object-contain" />
+            <img
+              src={value}
+              alt=""
+              className={cn(
+                "object-contain",
+                isFavicon ? "max-h-10 max-w-10" : "max-h-12 max-w-24",
+              )}
+            />
           ) : (
             <ImagePlus size={20} className="text-on-surface-muted" aria-hidden="true" />
           )}
@@ -62,7 +98,13 @@ export function LogoField({
           ) : (
             <ImagePlus size={15} aria-hidden="true" />
           )}
-          {value ? t("admin.brand.replace") : t("admin.brand.upload")}
+          {kind === "favicon"
+            ? value
+              ? t("admin.brand.replaceFavicon")
+              : t("admin.brand.uploadFavicon")
+            : value
+              ? t("admin.brand.replace")
+              : t("admin.brand.upload")}
         </Button>
         {value && (
           <Button type="button" variant="ghost" size="sm" onClick={() => onChange(null)}>
@@ -71,9 +113,21 @@ export function LogoField({
           </Button>
         )}
       </div>
-      <p className="text-xs text-on-surface-muted">{t("admin.brand.logoHint")}</p>
+      <p className="text-xs text-on-surface-muted">{hint}</p>
     </div>
   );
+}
+
+export function LogoField(props: Omit<BrandImageFieldProps, "kind">) {
+  return <BrandImageField kind="logo" {...props} />;
+}
+
+export function DarkLogoField(props: Omit<BrandImageFieldProps, "kind">) {
+  return <BrandImageField kind="darkLogo" {...props} />;
+}
+
+export function FaviconField(props: Omit<BrandImageFieldProps, "kind">) {
+  return <BrandImageField kind="favicon" {...props} />;
 }
 
 // Colours that read well as buttons on both light and dark backgrounds.

@@ -39,8 +39,8 @@ export function SiteFooter() {
   const whatsappHref = waLink(settings?.whatsapp);
 
   return (
-    <footer className="mt-16 border-t border-outline bg-section-alt">
-      <div className="container-page grid gap-8 py-10 sm:grid-cols-2 lg:grid-cols-3">
+    <footer className="mt-16 border-t border-outline bg-section-alt pb-[calc(67px_+_env(safe-area-inset-bottom,0px))] lg:pb-0">
+      <div className="container-page grid gap-8 pt-10 pb-0 sm:grid-cols-2 lg:grid-cols-3 lg:py-10">
         <div className="flex flex-col gap-2">
           <p className="font-display text-lg font-semibold">{settings?.name ?? t("app.name")}</p>
           {tagline && <p className="text-sm text-on-surface-muted">{tagline}</p>}
@@ -112,7 +112,7 @@ export function SiteFooter() {
       </div>
 
       {settings?.returns_note && (
-        <div className="container-page pb-6">
+        <div className="container-page pb-0 lg:pb-6">
           <p className="text-xs text-on-surface-muted">{settings.returns_note}</p>
         </div>
       )}

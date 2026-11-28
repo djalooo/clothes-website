@@ -70,7 +70,7 @@ Last verified against the built output, not the dev server.
 - **Shipping labels and CSV.** One order or every confirmed order, as 100 x 150 mm
   thermal labels or four per A4 sheet; a CSV of every order that Excel opens with
   Arabic intact.
-- **Branding.** Optional logo and brand colour, from the wizard or settings.
+- **Branding.** Optional light/dark logos, favicon and brand colour in settings.
 - **Photos by colour.** Uploaded once, shown on every size of that colour.
 
 - **Setup wizard.** Straight after claiming the shop: name, phone and WhatsApp

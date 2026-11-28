@@ -46,12 +46,28 @@ export function SiteHeader() {
           to="/"
           className="editorial-wordmark flex min-h-11 min-w-0 items-center gap-2 font-display text-lg font-semibold"
         >
-          {settings?.logo_url ? (
-            <img
-              src={settings.logo_url}
-              alt=""
-              className="h-9 max-w-[120px] shrink-0 object-contain"
-            />
+          {settings?.logo_url || settings?.logo_dark_url ? (
+            <span
+              className={cn(
+                "editorial-brand-logo grid h-9 shrink-0 place-items-center",
+                settings.logo_url && "has-light-logo",
+              )}
+            >
+              {settings.logo_url && (
+                <img
+                  src={settings.logo_url}
+                  alt=""
+                  className="brand-logo-light col-start-1 row-start-1 h-9 max-w-[120px] object-contain"
+                />
+              )}
+              {settings.logo_dark_url && (
+                <img
+                  src={settings.logo_dark_url}
+                  alt=""
+                  className="brand-logo-dark col-start-1 row-start-1 h-9 max-w-[120px] object-contain"
+                />
+              )}
+            </span>
           ) : (
             <Store size={20} className="shrink-0 text-primary" aria-hidden="true" />
           )}
